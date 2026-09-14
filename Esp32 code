@@ -1,0 +1,188 @@
+#include <ESP32Servo.h>
+
+// 🔥 Flame
+#define FLAME 34
+
+// 🔊 Buzzer
+#define BUZZER 15
+
+// 📏 Ultrasonic
+#define TRIG 5
+#define ECHO 18   // ⚠️ voltage divider use cheyyu
+
+// ⚙️ Servo
+#define SERVO_PIN 19
+
+// 🚗 Motor Driver (L298N)
+#define IN1 25
+#define IN2 26
+#define IN3 27
+#define IN4 14
+
+Servo myServo;
+
+bool fireDetected = false;
+
+// 🚗 MOTOR FORWARD
+void forward() {
+digitalWrite(IN1, HIGH);
+digitalWrite(IN2, LOW);
+digitalWrite(IN3, HIGH);
+digitalWrite(IN4, LOW);
+}
+
+// 🚗 STOP
+void stopMotor() {
+digitalWrite(IN1, LOW);
+digitalWrite(IN2, LOW);
+digitalWrite(IN3, LOW);
+digitalWrite(IN4, LOW);
+}
+
+// 📏 ULTRASONIC (AVERAGED STABLE VERSION)
+float getDistance() {
+long total = 0;
+int samples = 3;
+
+for (int i = 0; i < samples; i++) {
+digitalWrite(TRIG, LOW);
+delayMicroseconds(2);
+
+digitalWrite(TRIG, HIGH);  
+delayMicroseconds(10);  
+digitalWrite(TRIG, LOW);  
+
+long duration = pulseIn(ECHO, HIGH, 30000);  
+
+if (duration == 0) duration = 30000;  
+
+total += duration;  
+delay(10);
+
+}
+
+float avgDuration = total / samples;
+float dist = avgDuration * 0.034 / 2;
+
+return dist;
+}
+
+// 🔄 SCAN LEFT & RIGHT
+int scanDirection() {
+float leftDist, rightDist;
+
+myServo.write(30);
+delay(700);
+leftDist = getDistance();
+
+myServo.write(150);
+delay(700);
+rightDist = getDistance();
+
+myServo.write(90);
+delay(300);
+
+Serial.print("Left: ");
+Serial.print(leftDist);
+Serial.print(" | Right: ");
+Serial.println(rightDist);
+
+if (leftDist > rightDist) return 0;
+else return 1;
+}
+
+// 🔄 TURN LEFT
+void turnLeft() {
+Serial.println("LEFT");
+
+digitalWrite(IN1, LOW);
+digitalWrite(IN2, HIGH);
+digitalWrite(IN3, HIGH);
+digitalWrite(IN4, LOW);
+
+delay(700);
+stopMotor();
+}
+
+// 🔄 TURN RIGHT
+void turnRight() {
+Serial.println("RIGHT");
+
+digitalWrite(IN1, HIGH);
+digitalWrite(IN2, LOW);
+digitalWrite(IN3, LOW);
+digitalWrite(IN4, HIGH);
+
+delay(700);
+stopMotor();
+}
+
+void setup() {
+pinMode(FLAME, INPUT);
+pinMode(BUZZER, OUTPUT);
+
+pinMode(TRIG, OUTPUT);
+pinMode(ECHO, INPUT);
+
+pinMode(IN1, OUTPUT);
+pinMode(IN2, OUTPUT);
+pinMode(IN3, OUTPUT);
+pinMode(IN4, OUTPUT);
+
+myServo.attach(SERVO_PIN);
+myServo.write(90);
+
+Serial.begin(115200);
+}
+
+void loop() {
+
+int flameState = digitalRead(FLAME);
+
+// 🔥 FIRE DETECTED
+if (flameState == LOW && !fireDetected) {
+fireDetected = true;
+
+Serial.println("🔥 FIRE DETECTED");  
+
+// 🚨 Alarm pattern  
+for (int i = 0; i < 6; i++) {  
+  digitalWrite(BUZZER, HIGH);  
+  delay(300);  
+  digitalWrite(BUZZER, LOW);  
+  delay(300);  
+}
+
+}
+
+// 🔁 RESET IF FIRE GONE
+if (flameState == HIGH) {
+fireDetected = false;
+}
+
+// 🤖 MAIN LOGIC
+if (fireDetected) {
+
+float dist = getDistance();  
+Serial.print("Distance: ");  
+Serial.println(dist);  
+
+if (dist > 20 && dist < 200) {  
+  forward();  
+} else {  
+  stopMotor();  
+  delay(200);  
+
+  int dir = scanDirection();  
+
+  if (dir == 0) {  
+    turnLeft();  
+  } else {  
+    turnRight();  
+  }  
+}
+
+}
+
+delay(100);
+}
