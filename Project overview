@@ -1,0 +1,36 @@
+
+
+EXITRO is a low-cost emergency-safety robot prototype designed to assist in detecting potential fire hazards, identifying obstacles, and providing emergency alerts. The system integrates multiple sensors and actuators with an ESP32-based control unit to demonstrate an autonomous safety-oriented robotic platform.
+
+The robot combines flame detection, ultrasonic obstacle detection, servo-based scanning, motor control, and emergency alerting into a single system. The flame sensor is used to detect the presence of a possible fire source, while the ultrasonic sensor helps the robot identify obstacles in its surroundings. A servo motor enables directional scanning of the environment, allowing the ultrasonic sensor to cover different directions.
+
+The ESP32 acts as the central controller and processes the sensor inputs to determine the appropriate response. Based on the detected conditions, the robot can control its motors for movement and activate the buzzer to provide an audible emergency indication.
+
+EXITRO is primarily developed as an educational prototype to demonstrate the integration of embedded systems, robotics, sensors, actuators, and real-time decision-making in an emergency-safety application. The project can be further extended with features such as wireless monitoring, camera-based surveillance, live location tracking, IoT connectivity, and remote control.
+
+Key Features
+
+- 🔥 Flame detection for identifying potential fire hazards
+- 📏 Ultrasonic sensing for obstacle detection
+- 🔄 Servo-based environmental scanning
+- 🤖 ESP32-based central control
+- 🚗 Motor-driven robotic movement
+- 🔊 Buzzer-based emergency alert
+- ⚡ Low-cost embedded-system implementation
+- 🛠️ Modular design for future upgrades
+
+Technologies Used
+
+- ESP32
+- Flame Sensor
+- Ultrasonic Sensor
+- Servo Motor
+- DC Motors
+- Motor Driver
+- Buzzer
+- Arduino IDE / ESP32 Arduino Core
+- Embedded C/C++
+
+Project Objective
+
+The main objective of EXITRO is to develop a compact and affordable robotic prototype capable of sensing environmental hazards and responding to them through automated movement and alerts. The project demonstrates how multiple sensing and control modules can be integrated into an embedded robotic system for emergency-safety applications.
